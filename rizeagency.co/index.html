@@ -243,16 +243,41 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 			.branding .menu a:hover {
 				color: #cccccc !important;
 			}
-			/* Nav menu text white for dark header */
-			.main-menu-link,
-			.item-title,
-			.menu-link span,
-			.branding nav a,
-			.branding .menu a {
-				color: #ffffff !important;
+			/* Light mode: black text */
+			body.light .main-menu-link,
+			body.light .item-title,
+			body.light .menu-link span,
+			body.light .branding nav a,
+			body.light .branding .menu a,
+			html.light .main-menu-link,
+			html.light .item-title,
+			html.light .menu-link span,
+			html.light .branding nav a,
+			html.light .branding .menu a,
+			body:not(.dark) .main-menu-link,
+			body:not(.dark) .item-title,
+			body:not(.dark) .menu-link span,
+			body:not(.dark) .branding nav a,
+			body:not(.dark) .branding .menu a {
+				color: #000000 !important;
 			}
-			.branding .menu a:hover {
-				color: #cccccc !important;
+			/* Light mode: black text */
+			body.light .main-menu-link,
+			body.light .item-title,
+			body.light .menu-link span,
+			body.light .branding nav a,
+			body.light .branding .menu a,
+			html.light .main-menu-link,
+			html.light .item-title,
+			html.light .menu-link span,
+			html.light .branding nav a,
+			html.light .branding .menu a,
+			body:not(.dark) .main-menu-link,
+			body:not(.dark) .item-title,
+			body:not(.dark) .menu-link span,
+			body:not(.dark) .branding nav a,
+			body:not(.dark) .branding .menu a {
+				color: #000000 !important;
 			}
 		</style>
 </head>

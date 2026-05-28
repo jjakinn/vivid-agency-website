@@ -220,6 +220,24 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 			.branding .menu a:hover {
 				color: #cccccc !important;
 			}
+			/* Light mode: black text */
+			body.light .main-menu-link,
+			body.light .item-title,
+			body.light .menu-link span,
+			body.light .branding nav a,
+			body.light .branding .menu a,
+			html.light .main-menu-link,
+			html.light .item-title,
+			html.light .menu-link span,
+			html.light .branding nav a,
+			html.light .branding .menu a,
+			body:not(.dark) .main-menu-link,
+			body:not(.dark) .item-title,
+			body:not(.dark) .menu-link span,
+			body:not(.dark) .branding nav a,
+			body:not(.dark) .branding .menu a {
+				color: #000000 !important;
+			}
 		</style>
 </head>
 <body class="error404 wp-embed-responsive wp-theme-ohio hfeed ohio-theme-3-0 with-switcher with-header-1 with-fixed-search with-sticky links-underline icon-buttons-animation ohio-anchor-onepage elementor-default elementor-kit-6">
