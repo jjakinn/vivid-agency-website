@@ -209,34 +209,33 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 				max-height: 50px !important;
 				width: auto !important;
 			}
-			/* Nav menu text white for dark header */
+			/* Default: black nav text for light backgrounds */
 			.main-menu-link,
 			.item-title,
 			.menu-link span,
 			.branding nav a,
 			.branding .menu a {
-				color: #ffffff !important;
+				color: #000000 !important;
 			}
 			.branding .menu a:hover {
-				color: #cccccc !important;
+				color: #333333 !important;
 			}
-			/* Light mode: black text */
-			body.light .main-menu-link,
-			body.light .item-title,
-			body.light .menu-link span,
-			body.light .branding nav a,
-			body.light .branding .menu a,
-			html.light .main-menu-link,
-			html.light .item-title,
-			html.light .menu-link span,
-			html.light .branding nav a,
-			html.light .branding .menu a,
-			body:not(.dark) .main-menu-link,
-			body:not(.dark) .item-title,
-			body:not(.dark) .menu-link span,
-			body:not(.dark) .branding nav a,
-			body:not(.dark) .branding .menu a {
-				color: #000000 !important;
+			/* Dark mode: white text */
+			body.dark .main-menu-link,
+			body.dark .item-title,
+			body.dark .menu-link span,
+			body.dark .branding nav a,
+			body.dark .branding .menu a,
+			html.dark .main-menu-link,
+			html.dark .item-title,
+			html.dark .menu-link span,
+			html.dark .branding nav a,
+			html.dark .branding .menu a {
+				color: #ffffff !important;
+			}
+			body.dark .branding .menu a:hover,
+			html.dark .branding .menu a:hover {
+				color: #cccccc !important;
 			}
 		</style>
 </head>
