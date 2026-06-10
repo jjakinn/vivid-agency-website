@@ -157,34 +157,26 @@ html.dark .branding .logo-sticky img.dark-scheme-logo,
 html.dark .branding .logo-sticky-mobile img.dark-scheme-logo,
 html.dark .branding .logo-dynamic img.dark-scheme-logo { display: block !important; }
 
-/* === COMPREHENSIVE LOGO FIX ===
-   Problem: header-dynamic-typo tries to swap .logo -> .logo-dynamic on scroll,
-   but logo-dynamic has broken JS (both spans are .hidden). 
-   Solution: Force .logo to ALWAYS stay visible. Hide .logo-dynamic permanently.
-   Light/dark mode handled by .logo's light-scheme-logo / dark-scheme-logo classes.
+/* === LOGO FIX ===
+   Removed header-dynamic-typo so Ohio theme no longer tries to swap .logo for .logo-dynamic.
+   .logo stays visible. .logo-sticky shows normally when header is sticky.
+   .logo-dynamic is hidden permanently. Light/dark mode works via .logo images.
 */
 
-/* 1. Force .logo container to ALWAYS be visible regardless of Ohio theme */
-.branding .logo,
-.branding .logo-mobile,
-.branding .logo-sticky,
-.branding .logo-sticky-mobile {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
+/* 1. Hide .logo-dynamic completely to prevent duplication */
+.branding .logo-dynamic,
+.branding .logo-dynamic .hidden,
+.branding .logo-dynamic .hidden img,
+.branding .logo-dynamic .dark,
+.branding .logo-dynamic .light,
+.branding .logo-dynamic .dark img,
+.branding .logo-dynamic .light img {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
 }
 
-/* 2. Force logo images inside .logo to ALWAYS be visible */
-.branding .logo img,
-.branding .logo-mobile img,
-.branding .logo-sticky img,
-.branding .logo-sticky-mobile img {
-    display: block !important;
-    visibility: visible !important;
-    opacity: 1 !important;
-}
-
-/* 3. Light mode: show black logo, hide white logo */
+/* 2. Light mode: show black logo, hide white logo */
 .branding .logo img.light-scheme-logo,
 .branding .logo-mobile img.light-scheme-logo,
 .branding .logo-sticky img.light-scheme-logo,
@@ -198,7 +190,7 @@ html.dark .branding .logo-dynamic img.dark-scheme-logo { display: block !importa
     display: none !important;
 }
 
-/* 4. Dark mode: show white logo, hide black logo */
+/* 3. Dark mode: show white logo, hide black logo */
 body.dark-scheme .branding .logo img.light-scheme-logo,
 body.dark .branding .logo img.light-scheme-logo,
 html.dark .branding .logo img.light-scheme-logo,
@@ -227,19 +219,6 @@ body.dark-scheme .branding .logo-sticky-mobile img.dark-scheme-logo,
 body.dark .branding .logo-sticky-mobile img.dark-scheme-logo,
 html.dark .branding .logo-sticky-mobile img.dark-scheme-logo {
     display: block !important;
-}
-
-/* 5. Permanently hide .logo-dynamic to prevent duplication */
-.branding .logo-dynamic,
-.branding .logo-dynamic .hidden,
-.branding .logo-dynamic .hidden img,
-.branding .logo-dynamic .dark,
-.branding .logo-dynamic .light,
-.branding .logo-dynamic .dark img,
-.branding .logo-dynamic .light img {
-    display: none !important;
-    visibility: hidden !important;
-    opacity: 0 !important;
 }
 </style>
 <script>
@@ -482,7 +461,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 
-<header id="masthead" class="header header-3 without-mobile-search header-dynamic-typo both-types"
+<header id="masthead" class="header header-3 without-mobile-search both-types"
 	 data-header-fixed="true"		 data-fixed-initial-offset="150">
 	<div class="header-wrap">
 		<div class="header-wrap-inner">
