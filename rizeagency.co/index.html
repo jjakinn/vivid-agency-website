@@ -163,6 +163,11 @@ html.dark .branding .logo-dynamic img.dark-scheme-logo { display: block !importa
     display: none !important;
 }
 
+/* Hide logo-dynamic entirely to prevent duplication - .logo already handles light/dark */
+.branding .logo-dynamic {
+    display: none !important;
+}
+
 /* Override: ensure logo-dynamic always shows one logo even when JS fails */
 .header-dynamic-typo .branding .logo-dynamic .light,
 .header-dynamic-typo .branding .logo-dynamic .light img {
