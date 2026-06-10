@@ -163,6 +163,28 @@ html.dark .branding .logo-dynamic img.dark-scheme-logo { display: block !importa
     display: none !important;
 }
 
+/* Override: ensure logo-dynamic always shows one logo even when JS fails */
+.header-dynamic-typo .branding .logo-dynamic .light,
+.header-dynamic-typo .branding .logo-dynamic .light img {
+    display: block !important;
+}
+
+/* Dark mode: show white logo, hide black logo */
+body.dark-scheme .header-dynamic-typo .branding .logo-dynamic .light,
+body.dark .header-dynamic-typo .branding .logo-dynamic .light,
+html.dark .header-dynamic-typo .branding .logo-dynamic .light {
+    display: none !important;
+}
+
+body.dark-scheme .header-dynamic-typo .branding .logo-dynamic .dark,
+body.dark .header-dynamic-typo .branding .logo-dynamic .dark,
+html.dark .header-dynamic-typo .branding .logo-dynamic .dark,
+body.dark-scheme .header-dynamic-typo .branding .logo-dynamic .dark img,
+body.dark .header-dynamic-typo .branding .logo-dynamic .dark img,
+html.dark .header-dynamic-typo .branding .logo-dynamic .dark img {
+    display: block !important;
+}
+
 /* Only show logo-dynamic when header-dynamic-typo is actively toggling it */
 .header-dynamic-typo .branding .logo-dynamic .dark:not(.hidden),
 .header-dynamic-typo .branding .logo-dynamic .light:not(.hidden) {
