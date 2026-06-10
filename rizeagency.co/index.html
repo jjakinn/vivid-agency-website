@@ -156,6 +156,23 @@ html.dark .branding .logo-mobile img.dark-scheme-logo,
 html.dark .branding .logo-sticky img.dark-scheme-logo,
 html.dark .branding .logo-sticky-mobile img.dark-scheme-logo,
 html.dark .branding .logo-dynamic img.dark-scheme-logo { display: block !important; }
+
+/* Safari fix: prevent logo-dynamic from duplicating when hidden */
+.branding .logo-dynamic .hidden,
+.branding .logo-dynamic .hidden img {
+    display: none !important;
+}
+
+/* Only show logo-dynamic when header-dynamic-typo is actively toggling it */
+.header-dynamic-typo .branding .logo-dynamic .dark:not(.hidden),
+.header-dynamic-typo .branding .logo-dynamic .light:not(.hidden) {
+    display: block !important;
+}
+
+.header-dynamic-typo .branding .logo-dynamic .dark:not(.hidden) img,
+.header-dynamic-typo .branding .logo-dynamic .light:not(.hidden) img {
+    display: block !important;
+}
 </style>
 <link rel='stylesheet' id='elementor-icons-css' href='wp-content/plugins/elementor/assets/lib/eicons/css/elementor-icons.minc98d.css?ver=5.49.0' media='all' />
 <link rel='stylesheet' id='elementor-frontend-css' href='wp-content/plugins/elementor/assets/css/frontend.min0235.css?ver=4.1.1' media='all' />
