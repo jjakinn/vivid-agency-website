@@ -249,8 +249,18 @@ img:is([sizes=auto i],[sizes^="auto," i]){contain-intrinsic-size:3000px 1500px}
 				body.dark-scheme .branding .menu a:hover {
 				color: #cccccc !important;
 			}
-		
-/* === LOGO FIX === */
+			/* Hamburger sidebar: force white text on dark background */
+			.hamburger-nav .menu .mega-menu-item .menu-link span,
+			.hamburger-nav .menu .nav-item .menu-link span,
+			.hamburger-nav .menu .mega-menu-item > a,
+			.hamburger-nav .menu .nav-item > a {
+				color: #ffffff !important;
+			}
+			.hamburger-nav-details a,
+			.hamburger-nav-details span {
+				color: #ffffff !important;
+			}
+		/* === LOGO FIX === */
 .branding .logo-dynamic,
 .branding .logo-dynamic .hidden,
 .branding .logo-dynamic .hidden img,
