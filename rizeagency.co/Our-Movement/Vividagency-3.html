@@ -305,6 +305,19 @@ body.dark .branding .logo-sticky-mobile img.dark-scheme-logo,
 html.dark .branding .logo-sticky-mobile img.dark-scheme-logo {
     display: block !important;
 }
+
+/* Force transparent background on all logo elements to prevent white box */
+.branding .logo,
+.branding .logo img,
+.branding .logo-mobile,
+.branding .logo-mobile img,
+.branding .logo-sticky,
+.branding .logo-sticky img,
+.branding .logo-sticky-mobile,
+.branding .logo-sticky-mobile img {
+    background: transparent !important;
+    background-color: transparent !important;
+}
 </style>
 </head>
 <body class="error404 wp-embed-responsive wp-theme-ohio hfeed ohio-theme-3-0 with-switcher with-header-1 with-fixed-search with-sticky links-underline icon-buttons-animation ohio-anchor-onepage elementor-default elementor-kit-6">
