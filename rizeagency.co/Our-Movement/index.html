@@ -368,6 +368,35 @@ html.dark .branding .logo-sticky-mobile img.dark-scheme-logo {
 </style>
 </head>
 <body class="wp-singular page-template-default page page-id-224491 wp-embed-responsive wp-theme-ohio ohio-theme-3-0 with-switcher with-header-3 with-fixed-search with-sticky links-underline icon-buttons-animation ohio-anchor-onepage elementor-default elementor-kit-6 elementor-page elementor-page-224491">
+<script>
+// Dark mode persistence: restore before content renders
+(function() {
+  var isDark = localStorage.getItem('vivid-dark-mode') === 'true';
+  if (isDark) {
+    document.body.classList.add('dark-scheme');
+    document.querySelectorAll('.color-switcher').forEach(function(el) {
+      el.classList.add('dark');
+    });
+    document.querySelectorAll('.clb__light_section').forEach(function(el) {
+      el.classList.remove('clb__light_section');
+      el.classList.add('clb__dark_section');
+    });
+  }
+})();
+</script>
+<script>
+// Dark mode persistence: save on toggle
+document.addEventListener('DOMContentLoaded', function() {
+  document.querySelectorAll('.color-switcher').forEach(function(switcher) {
+    switcher.addEventListener('click', function() {
+      setTimeout(function() {
+        var isDark = document.body.classList.contains('dark-scheme');
+        localStorage.setItem('vivid-dark-mode', isDark);
+      }, 50);
+    });
+  });
+});
+</script>
 
 	
 
