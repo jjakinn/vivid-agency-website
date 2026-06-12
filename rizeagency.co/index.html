@@ -984,72 +984,107 @@ document.addEventListener('DOMContentLoaded', function() {
 (function() {
     'use strict';
     
-    // Safari autoplay manager for background video
+    function attemptPlay(video) {
+        if (!video || !video.paused) return;
+        video.load();
+        var promise = video.play();
+        if (promise !== undefined) {
+            promise.catch(function(err) {
+                console.log('Autoplay blocked:', err.name);
+            });
+        }
+    }
+    
     function initVideoAutoplay() {
         var section = document.querySelector('[data-id="b93a381"]');
         if (!section) return;
         
-        // Remove any iframe Elementor might have injected
         var container = section.querySelector('.elementor-background-video-container');
-        if (container) {
-            var iframes = container.querySelectorAll('iframe');
-            iframes.forEach(function(iframe) { iframe.remove(); });
-        }
+        if (!container) return;
         
-        var video = section.querySelector('video.elementor-background-video-hosted');
+        var video = container.querySelector('video.elementor-background-video-hosted');
         if (!video) return;
         
-        // Ensure video is properly configured
+        // Force muted and playsinline on existing video
         video.muted = true;
         video.playsInline = true;
         video.setAttribute('playsinline', '');
         video.setAttribute('muted', '');
         video.setAttribute('autoplay', '');
         
-        function attemptPlay() {
-            var playPromise = video.play();
-            if (playPromise !== undefined) {
-                playPromise.catch(function(error) {
-                    console.log('Video autoplay blocked, will retry on visibility:', error.name);
-                });
-            }
-        }
+        // Try to play immediately and on events
+        attemptPlay(video);
+        video.addEventListener('canplay', function() { attemptPlay(video); }, { once: true });
+        video.addEventListener('loadeddata', function() { attemptPlay(video); }, { once: true });
+        video.addEventListener('loadedmetadata', function() { attemptPlay(video); }, { once: true });
         
-        // Try to play immediately if video is ready
-        if (video.readyState >= 3) {
-            attemptPlay();
-        }
-        
-        // Also try on canplay event
-        video.addEventListener('canplay', attemptPlay, { once: true });
-        video.addEventListener('loadeddata', attemptPlay, { once: true });
-        
-        // Use IntersectionObserver to play when video becomes visible
+        // IntersectionObserver
         if ('IntersectionObserver' in window) {
             var observer = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
                     if (entry.isIntersecting && video.paused) {
-                        attemptPlay();
+                        attemptPlay(video);
                     }
                 });
-            }, { threshold: 0.1 });
+            }, { threshold: 0.01 });
             observer.observe(video);
         }
         
-        // Fallback: try playing periodically if still paused
-        var retryCount = 0;
-        var maxRetries = 10;
-        var interval = setInterval(function() {
-            if (!video.paused || retryCount >= maxRetries) {
-                clearInterval(interval);
-                return;
+        // If still paused after 1.5s, create fresh video element
+        // Safari re-evaluates autoplay on newly created elements
+        setTimeout(function() {
+            if (video.paused) {
+                var newVideo = document.createElement('video');
+                newVideo.className = 'elementor-background-video-hosted';
+                newVideo.style.cssText = video.style.cssText;
+                newVideo.setAttribute('aria-hidden', 'true');
+                
+                // CRITICAL: set muted/playsInline BEFORE appending to DOM
+                newVideo.muted = true;
+                newVideo.playsInline = true;
+                newVideo.autoplay = true;
+                newVideo.loop = true;
+                newVideo.setAttribute('autoplay', '');
+                newVideo.setAttribute('muted', '');
+                newVideo.setAttribute('playsinline', '');
+                newVideo.setAttribute('loop', '');
+                
+                var source = document.createElement('source');
+                source.src = 'wp-content/uploads/video-bg.mp4';
+                source.type = 'video/mp4';
+                newVideo.appendChild(source);
+                
+                video.parentNode.replaceChild(newVideo, video);
+                
+                attemptPlay(newVideo);
+                newVideo.addEventListener('canplay', function() { attemptPlay(newVideo); }, { once: true });
+                newVideo.addEventListener('loadeddata', function() { attemptPlay(newVideo); }, { once: true });
+                newVideo.addEventListener('loadedmetadata', function() { attemptPlay(newVideo); }, { once: true });
+                
+                if ('IntersectionObserver' in window) {
+                    var obs = new IntersectionObserver(function(entries) {
+                        entries.forEach(function(entry) {
+                            if (entry.isIntersecting && newVideo.paused) {
+                                attemptPlay(newVideo);
+                            }
+                        });
+                    }, { threshold: 0.01 });
+                    obs.observe(newVideo);
+                }
+                
+                var retries = 0;
+                var interval = setInterval(function() {
+                    if (!newVideo.paused || retries >= 30) {
+                        clearInterval(interval);
+                        return;
+                    }
+                    attemptPlay(newVideo);
+                    retries++;
+                }, 200);
             }
-            attemptPlay();
-            retryCount++;
-        }, 500);
+        }, 1500);
     }
     
-    // Run when DOM is ready
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', initVideoAutoplay);
     } else {
