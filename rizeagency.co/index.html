@@ -301,104 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <meta name="msapplication-TileImage" content="https://i0.wp.com/rizeagency.co/wp-content/uploads/2022/08/cropped-App-logo.png?fit=270%2C270&#038;ssl=1" />
 <script>function setREVStartSize(e){
 			//window.requestAnimationFrame<script>
-<script>
-(function() {
-    'use strict';
-    
-    function initVideoAutoplay() {
-        var section = document.querySelector('[data-id="b93a381"]');
-        if (!section) return;
-        
-        var container = section.querySelector('.elementor-background-video-container');
-        if (!container) return;
-        
-        // Remove any iframe Elementor might have injected
-        var iframes = container.querySelectorAll('iframe');
-        iframes.forEach(function(iframe) { iframe.remove(); });
-        
-        var oldVideo = container.querySelector('video.elementor-background-video-hosted');
-        if (!oldVideo) return;
-        
-        // Create a new video element dynamically - Safari treats this differently
-        var video = document.createElement('video');
-        video.className = 'elementor-background-video-hosted';
-        video.setAttribute('autoplay', 'autoplay');
-        video.setAttribute('muted', 'muted');
-        video.setAttribute('loop', 'loop');
-        video.setAttribute('playsinline', '');
-        video.setAttribute('webkit-playsinline', '');
-        video.setAttribute('disablePictureInPicture', '');
-        video.setAttribute('disableremoteplayback', '');
-        video.setAttribute('preload', 'metadata');
-        video.setAttribute('aria-hidden', 'true');
-        video.style.cssText = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;';
-        
-        // CRITICAL: Set muted before adding to DOM (Safari requirement)
-        video.muted = true;
-        video.playsInline = true;
-        video.autoplay = true;
-        video.loop = true;
-        
-        // Add source
-        var source = document.createElement('source');
-        source.src = 'wp-content/uploads/video-bg.mp4';
-        source.type = 'video/mp4';
-        video.appendChild(source);
-        
-        // Replace old video with new one
-        oldVideo.parentNode.replaceChild(video, oldVideo);
-        
-        function attemptPlay() {
-            if (video.paused) {
-                video.load();
-                var promise = video.play();
-                if (promise !== undefined) {
-                    promise.catch(function(err) {
-                        console.log('Autoplay attempt failed:', err.name);
-                    });
-                }
-            }
-        }
-        
-        // Try immediately
-        attemptPlay();
-        
-        // Try on various events
-        video.addEventListener('canplay', attemptPlay, { once: true });
-        video.addEventListener('loadedmetadata', attemptPlay, { once: true });
-        video.addEventListener('loadeddata', attemptPlay, { once: true });
-        
-        // IntersectionObserver for when video becomes visible
-        if ('IntersectionObserver' in window) {
-            var observer = new IntersectionObserver(function(entries) {
-                entries.forEach(function(entry) {
-                    if (entry.isIntersecting && video.paused) {
-                        attemptPlay();
-                    }
-                });
-            }, { threshold: 0.01 });
-            observer.observe(video);
-        }
-        
-        // Aggressive retry every 200ms for 6 seconds
-        var retries = 0;
-        var interval = setInterval(function() {
-            if (!video.paused || retries >= 30) {
-                clearInterval(interval);
-                return;
-            }
-            attemptPlay();
-            retries++;
-        }, 200);
-    }
-    
-    if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initVideoAutoplay);
-    } else {
-        initVideoAutoplay();
-    }
-})();
-</script>
+
 <style id="wp-custom-css">
 .site-footer {
  display: none;
@@ -986,7 +889,6 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function attemptPlay(video) {
         if (!video || !video.paused) return;
-        video.load();
         var promise = video.play();
         if (promise !== undefined) {
             promise.catch(function(err) {
@@ -1002,87 +904,100 @@ document.addEventListener('DOMContentLoaded', function() {
         var container = section.querySelector('.elementor-background-video-container');
         if (!container) return;
         
-        var video = container.querySelector('video.elementor-background-video-hosted');
-        if (!video) return;
+        // Remove the existing video element from HTML
+        // Safari won't see it on initial parse and make an early autoplay decision
+        var oldVideo = container.querySelector('video.elementor-background-video-hosted');
+        if (oldVideo) {
+            oldVideo.remove();
+        }
         
-        // Force muted and playsinline on existing video
-        video.muted = true;
-        video.playsInline = true;
-        video.setAttribute('playsinline', '');
-        video.setAttribute('muted', '');
-        video.setAttribute('autoplay', '');
+        // Also remove any iframe Elementor might have injected
+        var iframes = container.querySelectorAll('iframe');
+        iframes.forEach(function(iframe) { iframe.remove(); });
         
-        // Try to play immediately and on events
-        attemptPlay(video);
-        video.addEventListener('canplay', function() { attemptPlay(video); }, { once: true });
-        video.addEventListener('loadeddata', function() { attemptPlay(video); }, { once: true });
-        video.addEventListener('loadedmetadata', function() { attemptPlay(video); }, { once: true });
-        
-        // IntersectionObserver
+        // Use IntersectionObserver to create the video ONLY when it's visible
+        // Safari makes a fresh autoplay decision when the element is created in viewport
         if ('IntersectionObserver' in window) {
             var observer = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
-                    if (entry.isIntersecting && video.paused) {
+                    if (entry.isIntersecting) {
+                        // Create a fresh video element when visible
+                        var video = document.createElement('video');
+                        video.className = 'elementor-background-video-hosted';
+                        video.setAttribute('autoplay', '');
+                        video.setAttribute('muted', '');
+                        video.setAttribute('loop', '');
+                        video.setAttribute('playsinline', '');
+                        video.setAttribute('webkit-playsinline', '');
+                        video.setAttribute('disablePictureInPicture', '');
+                        video.setAttribute('disableremoteplayback', '');
+                        video.setAttribute('preload', 'metadata');
+                        video.setAttribute('aria-hidden', 'true');
+                        video.style.cssText = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;';
+                        
+                        // CRITICAL: set properties BEFORE appending to DOM
+                        video.muted = true;
+                        video.playsInline = true;
+                        video.autoplay = true;
+                        video.loop = true;
+                        
+                        var source = document.createElement('source');
+                        source.src = 'wp-content/uploads/video-bg.mp4?v=2';
+                        source.type = 'video/mp4';
+                        video.appendChild(source);
+                        
+                        container.appendChild(video);
+                        
                         attemptPlay(video);
+                        video.addEventListener('canplay', function() { attemptPlay(video); }, { once: true });
+                        video.addEventListener('loadeddata', function() { attemptPlay(video); }, { once: true });
+                        video.addEventListener('loadedmetadata', function() { attemptPlay(video); }, { once: true });
+                        
+                        // Aggressive retry every 200ms for 6 seconds
+                        var retries = 0;
+                        var interval = setInterval(function() {
+                            if (!video.paused || retries >= 30) {
+                                clearInterval(interval);
+                                return;
+                            }
+                            attemptPlay(video);
+                            retries++;
+                        }, 200);
+                        
+                        observer.disconnect();
                     }
                 });
             }, { threshold: 0.01 });
-            observer.observe(video);
+            observer.observe(container);
+        } else {
+            // Fallback: create video immediately if IntersectionObserver not available
+            var video = document.createElement('video');
+            video.className = 'elementor-background-video-hosted';
+            video.setAttribute('autoplay', '');
+            video.setAttribute('muted', '');
+            video.setAttribute('loop', '');
+            video.setAttribute('playsinline', '');
+            video.setAttribute('webkit-playsinline', '');
+            video.setAttribute('disablePictureInPicture', '');
+            video.setAttribute('disableremoteplayback', '');
+            video.setAttribute('preload', 'metadata');
+            video.setAttribute('aria-hidden', 'true');
+            video.style.cssText = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;';
+            
+            video.muted = true;
+            video.playsInline = true;
+            video.autoplay = true;
+            video.loop = true;
+            
+            var source = document.createElement('source');
+            source.src = 'wp-content/uploads/video-bg.mp4?v=2';
+            source.type = 'video/mp4';
+            video.appendChild(source);
+            
+            container.appendChild(video);
+            
+            attemptPlay(video);
         }
-        
-        // If still paused after 1.5s, create fresh video element
-        // Safari re-evaluates autoplay on newly created elements
-        setTimeout(function() {
-            if (video.paused) {
-                var newVideo = document.createElement('video');
-                newVideo.className = 'elementor-background-video-hosted';
-                newVideo.style.cssText = video.style.cssText;
-                newVideo.setAttribute('aria-hidden', 'true');
-                
-                // CRITICAL: set muted/playsInline BEFORE appending to DOM
-                newVideo.muted = true;
-                newVideo.playsInline = true;
-                newVideo.autoplay = true;
-                newVideo.loop = true;
-                newVideo.setAttribute('autoplay', '');
-                newVideo.setAttribute('muted', '');
-                newVideo.setAttribute('playsinline', '');
-                newVideo.setAttribute('loop', '');
-                
-                var source = document.createElement('source');
-                source.src = 'wp-content/uploads/video-bg.mp4';
-                source.type = 'video/mp4';
-                newVideo.appendChild(source);
-                
-                video.parentNode.replaceChild(newVideo, video);
-                
-                attemptPlay(newVideo);
-                newVideo.addEventListener('canplay', function() { attemptPlay(newVideo); }, { once: true });
-                newVideo.addEventListener('loadeddata', function() { attemptPlay(newVideo); }, { once: true });
-                newVideo.addEventListener('loadedmetadata', function() { attemptPlay(newVideo); }, { once: true });
-                
-                if ('IntersectionObserver' in window) {
-                    var obs = new IntersectionObserver(function(entries) {
-                        entries.forEach(function(entry) {
-                            if (entry.isIntersecting && newVideo.paused) {
-                                attemptPlay(newVideo);
-                            }
-                        });
-                    }, { threshold: 0.01 });
-                    obs.observe(newVideo);
-                }
-                
-                var retries = 0;
-                var interval = setInterval(function() {
-                    if (!newVideo.paused || retries >= 30) {
-                        clearInterval(interval);
-                        return;
-                    }
-                    attemptPlay(newVideo);
-                    retries++;
-                }, 200);
-            }
-        }, 1500);
     }
     
     if (document.readyState === 'loading') {
@@ -1092,6 +1007,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 })();
 </script>
+
 
 				<section class="elementor-section elementor-top-section elementor-element elementor-element-3dd7b4c elementor-section-stretched elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="3dd7b4c" data-element_type="section" data-e-type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;,&quot;stretch_section&quot;:&quot;section-stretched&quot;}">
 						<div class="elementor-container elementor-column-gap-no">
