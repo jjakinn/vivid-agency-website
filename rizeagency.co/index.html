@@ -301,6 +301,7 @@ document.addEventListener('DOMContentLoaded', function() {
 <meta name="msapplication-TileImage" content="https://i0.wp.com/rizeagency.co/wp-content/uploads/2022/08/cropped-App-logo.png?fit=270%2C270&#038;ssl=1" />
 <script>function setREVStartSize(e){
 			//window.requestAnimationFrame<script>
+<script>
 (function() {
     'use strict';
     
@@ -308,37 +309,66 @@ document.addEventListener('DOMContentLoaded', function() {
         var section = document.querySelector('[data-id="b93a381"]');
         if (!section) return;
         
-        var video = section.querySelector('video.elementor-background-video-hosted');
-        if (!video) return;
+        var container = section.querySelector('.elementor-background-video-container');
+        if (!container) return;
         
-        // Force all autoplay-required properties
+        // Remove any iframe Elementor might have injected
+        var iframes = container.querySelectorAll('iframe');
+        iframes.forEach(function(iframe) { iframe.remove(); });
+        
+        var oldVideo = container.querySelector('video.elementor-background-video-hosted');
+        if (!oldVideo) return;
+        
+        // Create a new video element dynamically - Safari treats this differently
+        var video = document.createElement('video');
+        video.className = 'elementor-background-video-hosted';
+        video.setAttribute('autoplay', 'autoplay');
+        video.setAttribute('muted', 'muted');
+        video.setAttribute('loop', 'loop');
+        video.setAttribute('playsinline', '');
+        video.setAttribute('webkit-playsinline', '');
+        video.setAttribute('disablePictureInPicture', '');
+        video.setAttribute('disableremoteplayback', '');
+        video.setAttribute('preload', 'metadata');
+        video.setAttribute('aria-hidden', 'true');
+        video.style.cssText = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;';
+        
+        // CRITICAL: Set muted before adding to DOM (Safari requirement)
         video.muted = true;
         video.playsInline = true;
         video.autoplay = true;
         video.loop = true;
-        video.setAttribute('muted', 'muted');
-        video.setAttribute('playsinline', '');
-        video.setAttribute('webkit-playsinline', '');
-        video.setAttribute('autoplay', 'autoplay');
+        
+        // Add source
+        var source = document.createElement('source');
+        source.src = 'wp-content/uploads/video-bg.mp4';
+        source.type = 'video/mp4';
+        video.appendChild(source);
+        
+        // Replace old video with new one
+        oldVideo.parentNode.replaceChild(video, oldVideo);
         
         function attemptPlay() {
             if (video.paused) {
+                video.load();
                 var promise = video.play();
                 if (promise !== undefined) {
                     promise.catch(function(err) {
-                        console.log('Autoplay blocked, retrying...', err.name);
+                        console.log('Autoplay attempt failed:', err.name);
                     });
                 }
             }
         }
         
-        // Try immediately and on various events
+        // Try immediately
         attemptPlay();
+        
+        // Try on various events
         video.addEventListener('canplay', attemptPlay, { once: true });
         video.addEventListener('loadedmetadata', attemptPlay, { once: true });
         video.addEventListener('loadeddata', attemptPlay, { once: true });
         
-        // IntersectionObserver for when video enters viewport
+        // IntersectionObserver for when video becomes visible
         if ('IntersectionObserver' in window) {
             var observer = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
@@ -350,11 +380,10 @@ document.addEventListener('DOMContentLoaded', function() {
             observer.observe(video);
         }
         
-        // Aggressive retry every 200ms for 5 seconds
+        // Aggressive retry every 200ms for 6 seconds
         var retries = 0;
-        var maxRetries = 25;
         var interval = setInterval(function() {
-            if (!video.paused || retries >= maxRetries) {
+            if (!video.paused || retries >= 30) {
                 clearInterval(interval);
                 return;
             }
@@ -941,7 +970,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		</section>
 				<section class="elementor-section elementor-top-section elementor-element elementor-element-b93a381 elementor-section-full_width elementor-section-stretched elementor-section-height-default elementor-section-height-default" data-id="b93a381" data-element_type="section" data-e-type="section" data-settings="{&quot;stretch_section&quot;:&quot;section-stretched&quot;}">
 																																																																<div class="elementor-background-video-container elementor-hidden-mobile" style="position:absolute;inset:0;overflow:hidden;z-index:0;">
-																																	<video class="elementor-background-video-hosted" src="wp-content/uploads/video-bg.mp4" type="video/mp4" autoplay="autoplay" muted="muted" loop="loop" playsinline="" webkit-playsinline="" preload="auto" onloadedmetadata="this.muted=true;this.play()" aria-hidden="true" style="position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;"></video>
+																																	<video class="elementor-background-video-hosted" autoplay="autoplay" muted="muted" loop="loop" playsinline="" webkit-playsinline="" preload="metadata" aria-hidden="true" style="position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;"><source src="wp-content/uploads/video-bg.mp4" type="video/mp4"></video>
 																																</div>
 								<div class="elementor-container elementor-column-gap-wide">
 					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-ad6f833" data-id="ad6f833" data-element_type="column" data-e-type="column">
@@ -1572,7 +1601,7 @@ document.addEventListener('DOMContentLoaded', function() {
 						<div class="elementor-element elementor-element-3aaf3cd elementor-widget elementor-widget-video" data-id="3aaf3cd" data-element_type="widget" data-e-type="widget" data-settings="{&quot;video_type&quot;:&quot;vimeo&quot;,&quot;show_image_overlay&quot;:&quot;yes&quot;,&quot;image_overlay&quot;:{&quot;url&quot;:&quot;https:\/\/rizeagency.co\/wp-content\/uploads\/2023\/03\/Screenshot-2023-03-10-at-14.57.18.png&quot;,&quot;id&quot;:224584,&quot;size&quot;:&quot;&quot;,&quot;alt&quot;:&quot;&quot;,&quot;source&quot;:&quot;library&quot;}}" data-widget_type="video.default">
 				<div class="elementor-widget-container">
 							<div class="elementor-wrapper elementor-open-inline">
-			<iframe class="elementor-video-iframe" allowfullscreen allow="clipboard-write" title="vimeo Video Player" src="https://player.vimeo.com/video/806829343?color&amp;autopause=0&amp;loop=0&amp;muted=0&amp;title=1&amp;portrait=1&amp;byline=1#t="></iframe>				<div class="elementor-custom-embed-image-overlay" style="background-image: url(https://i0.wp.com/rizeagency.co/wp-content/uploads/2023/03/Screenshot-2023-03-10-at-14.57.18.png?fit=768%2C521&amp;ssl=1);">
+			<iframe class="elementor-video-iframe" allowfullscreen allow="clipboard-write" title="vimeo Video Player" src="https://player.vimeo.com/video/806829343?color&amp;autopause=0&amp;loop=0&amp;muted=1&amp;title=1&amp;portrait=1&amp;byline=1#t="></iframe>				<div class="elementor-custom-embed-image-overlay" style="background-image: url(https://i0.wp.com/rizeagency.co/wp-content/uploads/2023/03/Screenshot-2023-03-10-at-14.57.18.png?fit=768%2C521&amp;ssl=1);">
 																<div class="elementor-custom-embed-play" role="button" aria-label="Play Video" tabindex="0">
 							<i aria-hidden="true" class="eicon-play"></i>						</div>
 									</div>
