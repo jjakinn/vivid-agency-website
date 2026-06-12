@@ -363,6 +363,27 @@ document.addEventListener('DOMContentLoaded', function() {
 				max-height: 50px !important;
 				width: auto !important;
 			}
+			/* === UNIFIED LOGO FIX: same size & position across all pages & modes === */
+			.branding .logo,
+			.branding .logo-mobile {
+				position: relative !important;
+				display: inline-flex !important;
+				align-items: center !important;
+				justify-content: center !important;
+				width: 116px !important;
+				height: 50px !important;
+				overflow: hidden !important;
+			}
+			.branding .logo img,
+			.branding .logo-mobile img {
+				position: absolute !important;
+				top: 0 !important;
+				left: 0 !important;
+				width: 100% !important;
+				height: 100% !important;
+				object-fit: contain !important;
+				max-height: none !important;
+			}
 			/* Default: black nav text for light backgrounds */
 			.main-menu-link,
 			.item-title,
