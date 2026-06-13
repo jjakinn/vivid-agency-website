@@ -872,7 +872,7 @@ document.addEventListener('DOMContentLoaded', function() {
 					</div>
 		</section>
 				<section class="elementor-section elementor-top-section elementor-element elementor-element-b93a381 elementor-section-full_width elementor-section-stretched elementor-section-height-default elementor-section-height-default" data-id="b93a381" data-element_type="section" data-e-type="section" data-settings="{&quot;stretch_section&quot;:&quot;section-stretched&quot;}">
-																																																																<div class="elementor-background-video-container elementor-hidden-mobile" style="position:absolute;inset:0;overflow:hidden;z-index:0;">
+																																																																<div class="elementor-background-video-container" style="position:absolute;inset:0;overflow:hidden;z-index:0;">
 																																	<video class="elementor-background-video-hosted" autoplay="autoplay" muted="muted" loop="loop" playsinline="" webkit-playsinline="" preload="metadata" aria-hidden="true" style="position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;"><source src="wp-content/uploads/video-bg.mp4" type="video/mp4"></video>
 																																</div>
 								<div class="elementor-container elementor-column-gap-wide">
@@ -887,123 +887,112 @@ document.addEventListener('DOMContentLoaded', function() {
 (function() {
     'use strict';
     
-    function attemptPlay(video) {
-        if (!video || !video.paused) return;
-        var promise = video.play();
-        if (promise !== undefined) {
-            promise.catch(function(err) {
-                console.log('Autoplay blocked:', err.name);
+    var videoCreated = false;
+    
+    function createAndPlayVideo(container) {
+        if (videoCreated) return;
+        videoCreated = true;
+        
+        // Remove any existing video
+        var old = container.querySelector('video');
+        if (old) old.remove();
+        
+        var v = document.createElement('video');
+        v.className = 'elementor-background-video-hosted';
+        v.setAttribute('autoplay', '');
+        v.setAttribute('muted', 'muted');
+        v.setAttribute('loop', '');
+        v.setAttribute('playsinline', '');
+        v.setAttribute('webkit-playsinline', '');
+        v.setAttribute('disablePictureInPicture', '');
+        v.setAttribute('disableremoteplayback', '');
+        v.setAttribute('preload', 'auto');
+        v.setAttribute('aria-hidden', 'true');
+        v.style.cssText = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;';
+        
+        // CRITICAL for Safari: set these BEFORE src
+        v.defaultMuted = true;
+        v.muted = true;
+        v.playsInline = true;
+        v.autoplay = true;
+        v.loop = true;
+        
+        // Use direct src, NOT <source> element - Safari requires this
+        v.src = 'wp-content/uploads/video-bg.mp4?v=3';
+        v.type = 'video/mp4';
+        
+        container.appendChild(v);
+        v.load();
+        
+        var playPromise = v.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(function(e) {
+                console.log('Autoplay blocked, will retry on interaction:', e.name);
             });
         }
+        
+        // Retry on various events
+        ['canplay', 'loadeddata', 'loadedmetadata'].forEach(function(evt) {
+            v.addEventListener(evt, function() { v.play(); }, { once: true });
+        });
+        
+        // Aggressive retry for 5s
+        var retries = 0;
+        var iv = setInterval(function() {
+            if (!v.paused || retries >= 25) {
+                clearInterval(iv);
+                return;
+            }
+            v.play();
+            retries++;
+        }, 200);
     }
     
-    function initVideoAutoplay() {
+    function init() {
         var section = document.querySelector('[data-id="b93a381"]');
         if (!section) return;
-        
         var container = section.querySelector('.elementor-background-video-container');
         if (!container) return;
         
-        // Remove the existing video element from HTML
-        // Safari won't see it on initial parse and make an early autoplay decision
-        var oldVideo = container.querySelector('video.elementor-background-video-hosted');
-        if (oldVideo) {
-            oldVideo.remove();
-        }
+        // Remove inline video if present
+        var inline = container.querySelector('video');
+        if (inline) inline.remove();
         
-        // Also remove any iframe Elementor might have injected
-        var iframes = container.querySelectorAll('iframe');
-        iframes.forEach(function(iframe) { iframe.remove(); });
-        
-        // Use IntersectionObserver to create the video ONLY when it's visible
-        // Safari makes a fresh autoplay decision when the element is created in viewport
+        // Scroll-triggered creation via IntersectionObserver
         if ('IntersectionObserver' in window) {
-            var observer = new IntersectionObserver(function(entries) {
+            var obs = new IntersectionObserver(function(entries) {
                 entries.forEach(function(entry) {
                     if (entry.isIntersecting) {
-                        // Create a fresh video element when visible
-                        var video = document.createElement('video');
-                        video.className = 'elementor-background-video-hosted';
-                        video.setAttribute('autoplay', '');
-                        video.setAttribute('muted', '');
-                        video.setAttribute('loop', '');
-                        video.setAttribute('playsinline', '');
-                        video.setAttribute('webkit-playsinline', '');
-                        video.setAttribute('disablePictureInPicture', '');
-                        video.setAttribute('disableremoteplayback', '');
-                        video.setAttribute('preload', 'metadata');
-                        video.setAttribute('aria-hidden', 'true');
-                        video.style.cssText = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;';
-                        
-                        // CRITICAL: set properties BEFORE appending to DOM
-                        video.muted = true;
-                        video.playsInline = true;
-                        video.autoplay = true;
-                        video.loop = true;
-                        
-                        var source = document.createElement('source');
-                        source.src = 'wp-content/uploads/video-bg.mp4?v=2';
-                        source.type = 'video/mp4';
-                        video.appendChild(source);
-                        
-                        container.appendChild(video);
-                        
-                        attemptPlay(video);
-                        video.addEventListener('canplay', function() { attemptPlay(video); }, { once: true });
-                        video.addEventListener('loadeddata', function() { attemptPlay(video); }, { once: true });
-                        video.addEventListener('loadedmetadata', function() { attemptPlay(video); }, { once: true });
-                        
-                        // Aggressive retry every 200ms for 6 seconds
-                        var retries = 0;
-                        var interval = setInterval(function() {
-                            if (!video.paused || retries >= 30) {
-                                clearInterval(interval);
-                                return;
-                            }
-                            attemptPlay(video);
-                            retries++;
-                        }, 200);
-                        
-                        observer.disconnect();
+                        createAndPlayVideo(container);
+                        obs.disconnect();
                     }
                 });
-            }, { threshold: 0.01 });
-            observer.observe(container);
+            }, { threshold: 0.05, rootMargin: '100px' });
+            obs.observe(container);
         } else {
-            // Fallback: create video immediately if IntersectionObserver not available
-            var video = document.createElement('video');
-            video.className = 'elementor-background-video-hosted';
-            video.setAttribute('autoplay', '');
-            video.setAttribute('muted', '');
-            video.setAttribute('loop', '');
-            video.setAttribute('playsinline', '');
-            video.setAttribute('webkit-playsinline', '');
-            video.setAttribute('disablePictureInPicture', '');
-            video.setAttribute('disableremoteplayback', '');
-            video.setAttribute('preload', 'metadata');
-            video.setAttribute('aria-hidden', 'true');
-            video.style.cssText = 'position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;';
-            
-            video.muted = true;
-            video.playsInline = true;
-            video.autoplay = true;
-            video.loop = true;
-            
-            var source = document.createElement('source');
-            source.src = 'wp-content/uploads/video-bg.mp4?v=2';
-            source.type = 'video/mp4';
-            video.appendChild(source);
-            
-            container.appendChild(video);
-            
-            attemptPlay(video);
+            createAndPlayVideo(container);
         }
+        
+        // SAFARI FALLBACK: any user interaction (scroll, click, touch) unlocks autoplay
+        var interactionEvents = ['scroll', 'click', 'touchstart', 'keydown'];
+        var handler = function() {
+            var v = container.querySelector('video');
+            if (v && v.paused) {
+                v.play().catch(function(){});
+            }
+            interactionEvents.forEach(function(evt) {
+                document.removeEventListener(evt, handler, true);
+            });
+        };
+        interactionEvents.forEach(function(evt) {
+            document.addEventListener(evt, handler, true);
+        });
     }
     
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', initVideoAutoplay);
+        document.addEventListener('DOMContentLoaded', init);
     } else {
-        initVideoAutoplay();
+        init();
     }
 })();
 </script>
