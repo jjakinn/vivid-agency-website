@@ -906,17 +906,32 @@ document.addEventListener('DOMContentLoaded', function() {
 		</div>
 					</div>
 		</section>
-				<section class="elementor-section elementor-top-section elementor-element elementor-element-b93a381 elementor-section-full_width elementor-section-stretched elementor-section-height-default elementor-section-height-default" data-id="b93a381" data-element_type="section" data-e-type="section" data-settings="{&quot;stretch_section&quot;:&quot;section-stretched&quot;,&quot;background_background&quot;:&quot;video&quot;,&quot;background_video_link&quot;:&quot;https:\/\/vimeo.com\/739678743&quot;}">
-								<div class="elementor-background-video-container elementor-hidden-mobile">
-													<div class="elementor-background-video-embed" role="presentation"></div>
-												</div>
-								<div class="elementor-container elementor-column-gap-wide">
-					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-ad6f833" data-id="ad6f833" data-element_type="column" data-e-type="column">
-			<div class="elementor-widget-wrap">
-							</div>
-		</div>
-					</div>
-		</section>
+				<section class="elementor-section elementor-top-section elementor-element elementor-element-b93a381 elementor-section-full_width elementor-section-stretched elementor-section-height-default elementor-section-height-default" data-id="b93a381" data-element_type="section" data-e-type="section" data-settings="{&quot;stretch_section&quot;:&quot;section-stretched&quot;}">
+<div class="elementor-background-video-container" style="position:absolute;inset:0;overflow:hidden;z-index:0;">
+<video class="elementor-background-video-hosted" src="wp-content/uploads/video-bg.mp4" autoplay muted loop playsinline webkit-playsinline preload="auto" aria-hidden="true" style="position:absolute;top:50%;left:50%;min-width:100%;min-height:100%;width:auto;height:auto;transform:translate(-50%,-50%);object-fit:cover;"></video>
+</div>
+<div class="elementor-container elementor-column-gap-wide">
+<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-ad6f833" data-id="ad6f833" data-element_type="column" data-e-type="column">
+<div class="elementor-widget-wrap">
+</div>
+</div>
+</div>
+</section>
+
+<script>
+(function() {
+    var video = document.querySelector('[data-id="b93a381"] video');
+    if (!video) return;
+    
+    function tryPlay() {
+        if (video.paused) video.play();
+    }
+    
+    ['scroll', 'click', 'touchstart', 'keydown'].forEach(function(evt) {
+        document.addEventListener(evt, tryPlay, { once: true, passive: true });
+    });
+})();
+</script>
 				<section class="elementor-section elementor-top-section elementor-element elementor-element-3dd7b4c elementor-section-stretched elementor-section-boxed elementor-section-height-default elementor-section-height-default" data-id="3dd7b4c" data-element_type="section" data-e-type="section" data-settings="{&quot;background_background&quot;:&quot;classic&quot;,&quot;stretch_section&quot;:&quot;section-stretched&quot;}">
 						<div class="elementor-container elementor-column-gap-no">
 					<div class="elementor-column elementor-col-100 elementor-top-column elementor-element elementor-element-3fc5948" data-id="3fc5948" data-element_type="column" data-e-type="column">
